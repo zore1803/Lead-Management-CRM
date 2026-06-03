@@ -7,9 +7,26 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : []),
+  ...(process.env.CLIENT_URLS ? process.env.CLIENT_URLS.split(",") : [])
+].map((origin) => origin.trim().replace(/\/$/, ""));
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173"
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const isAllowed =
+        allowedOrigins.includes(normalizedOrigin) ||
+        normalizedOrigin.endsWith(".vercel.app");
+
+      if (isAllowed) return callback(null, true);
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
   })
 );
 app.use(express.json());
