@@ -11,12 +11,17 @@ const serverEnvPath = path.resolve(__dirname, "../.env");
 dotenv.config({ path: rootEnvPath });
 dotenv.config({ path: serverEnvPath, override: false });
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.supabase_project_url;
-const supabaseKey =
+function cleanEnv(value) {
+  return value?.trim().replace(/^["']|["']$/g, "");
+}
+
+const supabaseUrl = cleanEnv(process.env.SUPABASE_URL || process.env.supabase_project_url);
+const supabaseKey = cleanEnv(
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.supabase_service_role_key ||
   process.env.SUPABASE_ANON_KEY ||
-  process.env.supabase_anon_key;
+  process.env.supabase_anon_key
+);
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required. Add them to the root .env file.");
