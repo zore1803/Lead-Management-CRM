@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+server/server.log
+server/server.err.log
+client/client.log
+client/client.err.log
